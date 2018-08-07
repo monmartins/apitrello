@@ -128,7 +128,7 @@ def webhook(request):
         LIST_NAME = json.loads(request.body)['action']['data']['listAfter']['name']
         if LIST_NAME in 'Pedido Realizado':
             LIST_NAME = 'PER'
-        elif LIST_NAME in 'Separação em Estoque':
+        elif 'Separa' in LIST_NAME and ' em Estoque' in LIST_NAME :
             LIST_NAME = 'SES'
         elif LIST_NAME in 'Em montagem Rígido':
             LIST_NAME = 'EMM'
