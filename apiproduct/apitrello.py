@@ -6,7 +6,7 @@ import requests, json
 TOKEN = '70518db137383f1c54096206149f9ea133f658bfc549ef6551994df440241f91'
 KEY = '9238b082437c1752cc7b660098e5dcdf'
 AUTH = {'key':KEY,'token':TOKEN}
-URLEXTERNAL = "http://ramonmc.pythonanywhere.com"
+URLEXTERNAL = "http://djangotrello.ddns.net"
 URLWEBHOOK = "https://api.trello.com/1/webhooks/"
 BOARD_ID = ""
 
