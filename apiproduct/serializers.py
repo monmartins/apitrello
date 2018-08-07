@@ -17,7 +17,8 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
 class StockSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Stock
-        fields = ('url','id','product','quantity')
+        extra_kwargs = {'product_name': {'read_only': True}}
+        fields = ('url','id','product_name','product','quantity')
 
 class DemandSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

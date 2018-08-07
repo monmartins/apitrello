@@ -41,7 +41,11 @@ class Product(models.Model):
 class Stock(models.Model):
     id =  models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_name = models.TextField(validators=[MaxLengthValidator(25)], editable=False)
     quantity = models.IntegerField()
+    def save(self, *args, **kwargs):
+        self.product_name = self.product.name
+        super(Stock, self).save(*args, **kwargs)
 
 
 class Demand(models.Model):
@@ -69,7 +73,51 @@ class Demand(models.Model):
     mot = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='mot_product')
     src = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='src_product')
 
-
     def save(self, *args, **kwargs):
-        self.price = self.proc.price + self.ram.price +self.hd.price +self.vcd.price + self.cab.price + self.mot.price +self.src.price
-        super(Demand, self).save(*args, **kwargs)
+        list_comp = [self.proc,self.ram,self.hd,self.vcd,self.cab,self.mot,self.src]
+        stock_quantity_negative = [] 
+        val = False
+        #Have in Stock?
+        # stock = Stock.objects.all()
+        for i in list_comp:
+            try:
+                if (Stock.objects.get(product_name=i.name)).quantity==0:
+                    val = False
+                    break
+                elif (Stock.objects.get(product_name=i.name)).quantity>0:
+                    stock_quantity_negative.append(i.name)
+                    val = True
+                    continue
+            except Stock.DoesNotExist:
+                val = False
+                break
+        #Each category only
+        # 
+        if val:
+            for i in list_comp:
+                count=0
+                for j in list_comp:
+                    if i.category in j.category:
+                        count=count+1
+                    if count >= 2:
+                        val = False
+                        break
+        #Is category correct?
+        if val and list_comp[0].category in 'PROC' and \
+        list_comp[1].category in 'RAM' and\
+        list_comp[2].category in 'HD' and \
+        list_comp[3].category in 'VCD' and \
+        list_comp[4].category in 'CAB' and \
+        list_comp[5].category in 'MOT' and \
+        list_comp[6].category in 'SRC' :
+            pass
+        else:
+            val = False
+
+        if val:
+            #update Stock
+            for i in stock_quantity_negative:
+                Stock.objects.filter(product_name=i).update(quantity=(Stock.objects.get(product_name=i)).quantity-1)
+            #update price
+            self.price = self.proc.price + self.ram.price +self.hd.price +self.vcd.price + self.cab.price + self.mot.price +self.src.price
+            super(Demand, self).save(*args, **kwargs)

@@ -31,11 +31,7 @@ router.register(r'demand', views_product.DemandViewSet)
 urlpatterns = [
 
     url(r'^', include(router.urls)),
-    url(r'^webhookCDO', views_product.webhookCDO, name='webhookCDO'),
-    url(r'^webhookRET', views_product.webhookRET, name='webhookRET'),
-    url(r'^webhookEMM', views_product.webhookEMM, name='webhookEMM'),
-    url(r'^webhookSES', views_product.webhookSES, name='webhookSES'),
-    url(r'^webhookPER', views_product.webhookPER, name='webhookPER'),
+    url(r'^webhook', views_product.webhook, name='webhook'),
 
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

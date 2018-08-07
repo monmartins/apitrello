@@ -84,8 +84,6 @@ class StockViewSet(viewsets.ModelViewSet):
 class DemandViewSet(viewsets.ModelViewSet):
     queryset = Demand.objects.all()
     serializer_class = DemandSerializer
-
-
     def create(self, request, *args, **kwargs):
         datamd = request.data.copy()
         datamd['status'] = 'PER'
@@ -134,26 +132,22 @@ class DemandViewSet(viewsets.ModelViewSet):
 from django.views.decorators.http import require_http_methods
 @csrf_exempt
 @require_http_methods(["HEAD", "POST"])
-def webhookCDO(request):
-    print(request.POST)
-    return HttpResponse(status=200)
-@csrf_exempt
-@require_http_methods(["HEAD", "POST"])
-def webhookRET(request):
-    print(request.POST)
-    return HttpResponse(status=200)
-@csrf_exempt
-@require_http_methods(["HEAD", "POST"])
-def webhookEMM(request):
-    print(request.POST)
-    return HttpResponse(status=200)
-@csrf_exempt
-@require_http_methods(["HEAD", "POST"])
-def webhookSES(request):
-    print(request.POST)
-    return HttpResponse(status=200)
-@csrf_exempt
-@require_http_methods(["HEAD", "POST"])
-def webhookPER(request):
-    print(request.POST)
-    return HttpResponse(status=200)
+def webhook(request):
+    if request.method in 'HEAD':
+        return HttpResponse(status=200)
+    if request.method in 'POST':
+        DEMAND_ID = json.loads(request.body)['model']['name'].split(" ")[1]
+        LIST_NAME = json.loads(request.body)['action']['data']['listAfter']['name']
+        if LIST_NAME in 'Pedido Realizado':
+            LIST_NAME = 'PER'
+        elif LIST_NAME in 'Separação em Estoque':
+            LIST_NAME = 'SES'
+        elif LIST_NAME in 'Em montagem Rígido':
+            LIST_NAME = 'EMM'
+        elif LIST_NAME in 'Realização de testes':
+            LIST_NAME = 'RET'
+        elif LIST_NAME in 'Concluído':
+            LIST_NAME = 'CDO'
+        LIST_ID = str(json.loads(request.body)['action']['display']).split("listAfter")[1].split("}")[0].split("id':")[1]
+        Demand.objects.filter(pk=DEMAND_ID).update(status=LIST_NAME)
+        return HttpResponse(status=200)
