@@ -91,18 +91,6 @@ class DemandViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        name = "Pedido "+serializer.data['id']
-        desc = "  Cliente:\n    nome: "+str(User.objects.filter(pk=str(serializer.data['user']).split("/")[-2]).first())+\
-        "\n email: "+(User.objects.filter(pk=str(serializer.data['user']).split("/")[-2]).first()).email+"\n\n"+\
-        "Componentes:\n"+\
-        "   Placa de Vídeo "+ serializer.data['vcd'].name+\
-        "   Processador "+serializer.data['proc'].name +\
-        "   Disco Rígido "+serializer.data['hd'].name+\
-        "   Memória "+serializer.data['ram'].name+\
-        "   Placa Mãe "+ serializer.data['mot'].name+\
-        "   Gabinete "+ serializer.data['cab'].name+\
-        "   Fonte "+ serializer.data['src'].name
-        trello.create_card(name,desc,"Pedido Realizado")
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 

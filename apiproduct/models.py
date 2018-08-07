@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.contrib.auth.models import User
+import apiproduct.apitrello as trello
 import uuid, datetime
 
 # Create your models here.
@@ -75,7 +76,7 @@ class Demand(models.Model):
 
     def save(self, *args, **kwargs):
         list_comp = [self.proc,self.ram,self.hd,self.vcd,self.cab,self.mot,self.src]
-        stock_quantity_negative = [] 
+        stock_quantity_negative = []
         val = False
         #Have in Stock?
         # stock = Stock.objects.all()
@@ -92,7 +93,7 @@ class Demand(models.Model):
                 val = False
                 break
         #Each category only
-        # 
+        #
         if val:
             for i in list_comp:
                 count=0
@@ -120,4 +121,16 @@ class Demand(models.Model):
                 Stock.objects.filter(product_name=i).update(quantity=(Stock.objects.get(product_name=i)).quantity-1)
             #update price
             self.price = self.proc.price + self.ram.price +self.hd.price +self.vcd.price + self.cab.price + self.mot.price +self.src.price
+            name = "Pedido "+str(self.id)
+            desc = "  Cliente:\n    nome: "+str(User.objects.filter(pk=str(self.user.id)).first())+\
+            "\n email: "+(User.objects.filter(pk=str(self.user.id)).first()).email+"\n\n"+\
+            "Componentes:\n"+\
+            "   Placa de Vídeo "+ self.vcd.name+\
+            "   Processador "+self.proc.name +\
+            "   Disco Rígido "+self.hd.name+\
+            "   Memória "+self.ram.name+\
+            "   Placa Mãe "+ self.mot.name+\
+            "   Gabinete "+ self.cab.name+\
+            "   Fonte "+self.src.name
+            trello.create_card(name,desc,"Pedido Realizado")
             super(Demand, self).save(*args, **kwargs)
