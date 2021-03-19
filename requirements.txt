@@ -4,7 +4,7 @@ cffi==1.11.5
 chardet==3.0.4
 cryptography==2.3
 Django==1.11.29
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 enum34==1.1.6
 future==0.16.0
 idna==2.7
